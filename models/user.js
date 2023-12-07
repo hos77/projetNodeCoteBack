@@ -32,6 +32,11 @@ const userShema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location',
       },
+
+      contrat: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Contrat',
+      },
    
 });
 module.exports = mongoose.model("User", userShema);

@@ -29,11 +29,8 @@ const locationSchema = new mongoose.Schema({
   },
   contrat: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Contrat",
-    required: true,
-
+    ref: "Contrat", 
   },
-
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

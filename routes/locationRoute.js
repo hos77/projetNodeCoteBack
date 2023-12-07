@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const Location = require("../models/location");
 const voitures = require("../models/voiture");
+const authMiddleware = require('../middlewares/auth');
+
 
 //createlocation
-router.post("/createlocations/:voitureId", async (req, res) => {
+router.post("/createlocations/:voitureId", authMiddleware ,  async (req, res) => {
   try {
     const { datedebut, datefin, coutTotal, etat } = req.body;
     const voitureId = req.params.voitureId;
@@ -25,6 +27,7 @@ router.post("/createlocations/:voitureId", async (req, res) => {
       coutTotal,
       etat,
       voiture: voitureId,
+      user: req.user.userId,
     });
     const savedLocation = await location.save();
     car.locations.push(savedLocation._id);
@@ -115,7 +118,7 @@ router.get("/locations", async (req, res) => {
 });
 
 //getLocationBycar
-router.get("/getLocationbyCar/:voitureId", async (req, res) => {
+router.get("/getLocationbyCar/:voitureId",  async (req, res) => {
   try {
     const voitureId = req.params.voitureId;
     const locations = await Location.find({ voiture: voitureId });
@@ -124,5 +127,20 @@ router.get("/getLocationbyCar/:voitureId", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+router.get('/locations/byuser', authMiddleware, async (req, res) => {
+  try {
+    const locations = await Location.find({ user: req.user.userId });
+    res.json(locations);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+
 
 module.exports = router;

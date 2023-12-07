@@ -11,6 +11,11 @@ const contratSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location',
       },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        require:true , 
+      },
     
     
 });

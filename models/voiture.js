@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 const voitureShema = new mongoose.Schema({
     marque: {
-        type: String,
-        required: true,
+        type: String, 
     },
     modele: {
+        type: String, 
+    },
+
+    picture: {
         type: String,
         required: true,
     },
@@ -33,12 +36,10 @@ const voitureShema = new mongoose.Schema({
         type : Number , 
         required: true ,
     },
-
     disponible: { type: Boolean, default: true },
 
     category:
     { type: mongoose.Schema.Types.ObjectId, ref: 'CategorieVoiture' },
-    
     locations: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location',

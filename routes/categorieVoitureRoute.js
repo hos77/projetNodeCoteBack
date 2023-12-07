@@ -3,11 +3,25 @@ const router = require('express').Router();
 const  CategorieVoiture = require('../models/categorieVoiture');
 const Voiture = require('../models/voiture');
 const Location = require('../models/location');
+const authMiddleware = require('../middlewares/auth');
+const multer = require('multer');
+fileName = '';
+var strg = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, './Upload');
+    },
+    filename: function(req, file, cb){
+        cb(null, file.fieldname + "" + Date.now() + "" + file.originalname);
+    },
+}); 
+
+const upload = multer({storage: strg});
+
 
 
 
 // Get all the  categories
-router.get('/categories', async (req, res) => {
+router.get('/categories', authMiddleware ,  async (req, res) => {
     try {
         const categories = await CategorieVoiture.find().populate('voitures');
         res.json(categories);
@@ -17,7 +31,7 @@ router.get('/categories', async (req, res) => {
 });
 
 // Get a specific category by ID
-router.get('/categories/:id', async (req, res) => {
+router.get('/categories/:id', authMiddleware ,  async (req, res) => {
     try {
         const category = await CategorieVoiture.findById(req.params.id).populate('voitures');
         res.json(category);
@@ -26,7 +40,7 @@ router.get('/categories/:id', async (req, res) => {
     }
 });
 // Update a category by ID
-router.patch('/categories/:id', async (req, res) => {
+router.patch('/categories/:id', authMiddleware , async (req, res) => {
     try {
         const updatedCategory = await CategorieVoiture.findByIdAndUpdate(
             req.params.id,
@@ -43,7 +57,7 @@ router.patch('/categories/:id', async (req, res) => {
     }
 });
 // Delete a category by ID
-router.delete('/categories/:id', async (req, res) => {
+router.delete('/categories/:id', authMiddleware ,  async (req, res) => {
     try {
         const deletedCategory = await CategorieVoiture.findByIdAndDelete(req.params.id);
         res.json(deletedCategory);
@@ -53,14 +67,17 @@ router.delete('/categories/:id', async (req, res) => {
 });
 
 // Create a new category
-router.post('/create_categories', async (req, res) => {
+router.post('/create_categories'  , authMiddleware  , async (req, res) => {
+
     const category = new CategorieVoiture({
         nom: req.body.nom,
         description: req.body.description,
+        photo : req.body.photo
     });
 
     try {
         const newCategory = await category.save();
+        fileName = '';
         res.status(201).json(newCategory);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -79,7 +96,7 @@ router.post('/create_categories', async (req, res) => {
 
 
 // Get all cars
-router.get('/voitures', async (req, res) => {
+router.get('/voitures', authMiddleware ,  async (req, res) => {
     try {
         const voitures = await Voiture.find();
         res.json(voitures);
@@ -88,7 +105,7 @@ router.get('/voitures', async (req, res) => {
     }
 });
 
-router.get('/voitures/:voitureId', async (req, res) => {
+router.get('/voitures/:voitureId', authMiddleware ,  async (req, res) => {
     try {
       const voitureId = req.params.voitureId;
       const voiture = await Voiture.findById(voitureId).populate('category').populate({
@@ -111,7 +128,7 @@ router.get('/voitures/:voitureId', async (req, res) => {
 
 
 //getAllcarbycategorie
-router.get('/getallcarbycategory/:categorieId' , async(req , res) =>{
+router.get('/getallcarbycategory/:categorieId' , authMiddleware ,  async(req , res) =>{
 
     try {
         const voitures = await Voiture.find({category : req.params.categorieId});
@@ -125,12 +142,13 @@ router.get('/getallcarbycategory/:categorieId' , async(req , res) =>{
 });
 
 //crete a car 
-router.post('/voitures/:categorieId', async (req, res) => {
+router.post('/voitures/:categorieId', authMiddleware , async (req, res) => {
     
     const categorie = await CategorieVoiture.findById(req.params.categorieId);
     const voiture = new Voiture({
         marque: req.body.marque,
         modele: req.body.modele,
+        picture : req.body.picture ,
         couleur: req.body.couleur,
         kilometrage: req.body.kilometrage,
         etat: req.body.etat,
@@ -151,36 +169,36 @@ router.post('/voitures/:categorieId', async (req, res) => {
 
 
 // Update a car by ID
-router.patch('/voitures/:id', async (req, res) => {
-    try {
-        const updatedVoiture = await Voiture.findByIdAndUpdate(
-            req.params.id,
-            {
-                marque: req.body.marque,
-                modele: req.body.modele,
-                couleur: req.body.couleur,
-                kilometrage: req.body.kilometrage,
-                etat: req.body.etat,
-                prix: req.body.prix,
-            },
-            { new: true }
-        );
+// router.patch('/voitures/:id', async (req, res) => {
+//     try {
+//         const updatedVoiture = await Voiture.findByIdAndUpdate(
+//             req.params.id,
+//             {
+//                 marque: req.body.marque,
+//                 modele: req.body.modele,
+//                 couleur: req.body.couleur,
+//                 kilometrage: req.body.kilometrage,
+//                 etat: req.body.etat,
+//                 prix: req.body.prix,
+//             },
+//             { new: true }
+//         );
 
-        res.json(updatedVoiture);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
+//         res.json(updatedVoiture);
+//     } catch (error) {
+//         res.status(400).json({ message: error.message });
+//     }
+// });
 
 // Delete a car by ID
-router.delete('/voitures/:id', async (req, res) => {
-    try {
-        const deletedVoiture = await Voiture.findByIdAndDelete(req.params.id);
-        res.json(deletedVoiture);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+// router.delete('/voitures/:id', async (req, res) => {
+//     try {
+//         const deletedVoiture = await Voiture.findByIdAndDelete(req.params.id);
+//         res.json(deletedVoiture);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// });
 
 
 

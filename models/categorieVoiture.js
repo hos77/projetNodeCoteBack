@@ -9,7 +9,12 @@ const categorieSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    },
+    }, 
+
+    photo : {
+
+        type: String,
+    } ,
 
     voitures: {
         type: mongoose.Schema.Types.ObjectId,
